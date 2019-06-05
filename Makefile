@@ -3,18 +3,18 @@
 # Specify library locations here (add or remove "#" marks to comment/uncomment lines for your platform)
 
 # Mac OS X
-DDG_INCLUDE_PATH      = -I/usr/local/include
-DDG_LIBRARY_PATH      = -L/usr/local/lib
-DDG_BLAS_LIBS         = -framework Accelerate
-DDG_SUITESPARSE_LIBS  = -lspqr -lumfpack -lcholmod -lmetis -lcolamd -lccolamd -lcamd -lamd -lm -lsuitesparseconfig
-DDG_OPENGL_LIBS       = -framework OpenGL -framework GLUT
+#DDG_INCLUDE_PATH      = -I/usr/local/include
+#DDG_LIBRARY_PATH      = -L/usr/local/lib
+#DDG_BLAS_LIBS         = -framework Accelerate
+#DDG_SUITESPARSE_LIBS  = -lspqr -lumfpack -lcholmod -lmetis -lcolamd -lccolamd -lcamd -lamd -lm -lsuitesparseconfig
+#DDG_OPENGL_LIBS       = -framework OpenGL -framework GLUT
 
 # # Linux
-# DDG_INCLUDE_PATH      =
-# DDG_LIBRARY_PATH      =
-# DDG_BLAS_LIBS         = -llapack -lblas -lgfortran
-# DDG_SUITESPARSE_LIBS  = -lspqr -lcholmod -lmetis -lcolamd -lccolamd -lcamd -lamd -lm
-# DDG_OPENGL_LIBS       = -lglut -lGL -lGLU -lX11
+ DDG_INCLUDE_PATH      = -I/usr/include/suitesparse -I/usr/include
+ DDG_LIBRARY_PATH      = -L/usr/local/lib -L/usr/lib/x86_64-linux-gnu/
+ DDG_BLAS_LIBS         = -llapack -lblas -lgfortran
+ DDG_SUITESPARSE_LIBS  = -lspqr -lcholmod -lumfpack -lmetis -lcolamd -lccolamd -lcamd -lamd -lm 
+ DDG_OPENGL_LIBS       = -lglut -lGL -lGLU -lX11
 
 # # Windows / Cygwin
 # DDG_INCLUDE_PATH      = -I/usr/include/opengl -I/usr/include/suitesparse
@@ -29,7 +29,7 @@ TARGET = fieldviz
 CLTARGET = fieldgen
 CC = g++
 LD = g++
-CFLAGS = -g -Wall -Wno-deprecated -Werror -Wno-error=deprecated-declarations -ansi -pedantic  $(DDG_INCLUDE_PATH) -I./include -I./src
+CFLAGS = -g -Wall -Wno-deprecated -Werror -Wno-error=deprecated-declarations -ansi -pedantic $(DDG_INCLUDE_PATH) -I./include -I./src -DGL_GLEXT_PROTOTYPES
 LFLAGS = -g -Wall -Wno-deprecated -Werror -pedantic $(DDG_LIBRARY_PATH)
 LIBS = $(DDG_OPENGL_LIBS) $(DDG_SUITESPARSE_LIBS) $(DDG_BLAS_LIBS)
 CLLIBS = $(DDG_SUITESPARSE_LIBS) $(DDG_BLAS_LIBS)
@@ -56,7 +56,7 @@ obj/Complex.o: src/Complex.cpp include/Complex.h
 obj/DenseMatrix.o: src/DenseMatrix.cpp include/DenseMatrix.h include/Types.h src/DenseMatrix.inl include/DenseMatrix.h include/LinearContext.h include/Quaternion.h include/Vector.h include/SparseMatrix.h include/Complex.h src/SparseMatrix.inl include/Real.h include/Complex.h include/Utility.h 
 	$(CC) $(CFLAGS) -c src/DenseMatrix.cpp -o obj/DenseMatrix.o
 
-obj/Edge.o: src/Edge.cpp include/Edge.h include/Types.h include/Quaternion.h include/Vector.h include/Complex.h include/Mesh.h include/HalfEdge.h include/Vertex.h include/Edge.h include/Face.h include/AliasTable.h include/Halfedge.h 
+obj/Edge.o: src/Edge.cpp include/Edge.h include/Types.h include/Quaternion.h include/Vector.h include/Complex.h include/Mesh.h include/Vertex.h include/Edge.h include/Face.h include/AliasTable.h
 	$(CC) $(CFLAGS) -c src/Edge.cpp -o obj/Edge.o
 
 obj/Face.o: src/Face.cpp include/Face.h include/Types.h include/Complex.h include/Vector.h include/Mesh.h include/HalfEdge.h include/Quaternion.h include/Vertex.h include/Edge.h include/Face.h include/AliasTable.h include/Vector.h include/Utility.h 
@@ -118,4 +118,5 @@ clean:
 	rm -f $(TARGET).exe
 	rm -f $(CLTARGET)
 	rm -f $(CLTARGET).exe
+
 

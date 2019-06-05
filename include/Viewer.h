@@ -11,7 +11,7 @@
 #define DDG_VIEWER_H
 
 #include <string>
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 #include "Mesh.h"
 #include "Camera.h"
 #include "Shader.h"

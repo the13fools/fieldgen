@@ -1,6 +1,5 @@
 #include "Edge.h"
 #include "Mesh.h"
-#include "HalfEdge.h"
 
 namespace DDG
 {
