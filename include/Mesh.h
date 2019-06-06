@@ -75,6 +75,9 @@ namespace DDG
     // writes a mesh to a Wavefront OBJ file; return value is nonzero
     // only if there was an error
     // the value n gives the degree of the field
+    int writeFaceField( const std::string& filename, unsigned int n ) const;
+    // samples vector field onto the mesh faces by averaging (taking into account symmetry)
+    // useful for I/O with systems that have face-based representations
 
     bool reload( void );
     // reloads a mesh from disk using the most recent input filename

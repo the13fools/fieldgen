@@ -128,6 +128,23 @@ namespace DDG
       return 0;
    }
 
+   int Mesh::writeFaceField( const string& filename, unsigned int n ) const
+   // reads a mesh from a Wavefront OBJ file; return value is nonzero
+   // only if there was an error
+   {
+      ofstream out( filename.c_str() );
+
+      if( !out.is_open() )
+      {
+         cerr << "Error writing to mesh file " << filename << endl;
+         return 1;
+      }
+
+      MeshIO::writeFaceField( out, *this, n );
+
+      return 0;
+   }
+
    bool Mesh::reload( void )
    {
       return read( inputFilename );

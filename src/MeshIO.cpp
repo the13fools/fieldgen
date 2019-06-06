@@ -147,6 +147,59 @@ namespace DDG
       }
 
    }
+
+   void MeshIO :: writeFaceField( ostream& out, const Mesh& mesh, unsigned int sym_deg )
+   {
+      for( FaceCIter f = mesh.faces.begin(); f != mesh.faces.end(); f++ )
+      {
+         Vector pi = f->he->vertex->fieldVector();
+         Vector pj = f->he->next->vertex->fieldVector();
+         Vector pk = f->he->next->next->vertex->fieldVector();
+
+         Vector e1 = f->he->vertex->position - f->he->next->vertex->position ;
+         Vector e2 = f->he->next->next->vertex->position - f->he->vertex->position ;
+         Vector n = cross(e1, e2);
+         n.normalize();
+
+         pi = pi - dot(pi, n) * n;
+         pj = pj - dot(pj, n) * n;
+         pk = pk - dot(pk, n) * n;
+         pi.normalize(); pj.normalize(); pk.normalize();
+
+         double maxdiff = dot(pj, pi);
+         Vector pj_rot = pj;
+         for (unsigned int j = 0; j < sym_deg + 1; j++)
+         {
+            Vector temp = cross(n, pj);
+            double newdiff = dot(temp, pi);
+            if ( newdiff > maxdiff )
+            {
+                pj_rot = temp;
+                maxdiff = newdiff;
+            }
+            pj = temp;
+         }
+
+         maxdiff = dot(pk, pi);
+         Vector pk_rot = pk;
+         for (unsigned int j = 0; j < sym_deg + 1; j++)
+         {
+            Vector temp = cross(n, pk);
+            double newdiff = dot(temp, pi);
+            if ( newdiff > maxdiff )
+            {
+                pk_rot = temp;
+                maxdiff = newdiff;
+            }
+            pk = temp;
+         }
+
+         Vector X = ( pi + pj_rot + pk_rot );
+         X.normalize();
+
+         out << X.x << " " << X.y << " " << X.z << endl;
+      }
+  }
    
    int MeshIO :: readMeshData( istream& in, MeshData& data )
    {

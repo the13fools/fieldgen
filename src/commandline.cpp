@@ -53,7 +53,7 @@ void parseArgs(int argc, char *argv[], std::string& inputPath, std::string& outp
       std::string sStr, tStr;
 
       for (int i = 3; i < argc; i++) {
-         if (parseArg(argv[i], "--degree=", degreeStr)) degree = std::stoi(degreeStr);
+         if (parseArg(argv[i], "--degree=", degreeStr)) degree = std::atoi(degreeStr.c_str());
          if (doesArgExist(argv[i], "--alignToCurvature")) alignToCurvature = true;
          if (doesArgExist(argv[i], "--alignToBoundary")) alignToBoundary = true;
          if (parseArg(argv[i], "--s=", sStr)) s = std::atof(sStr.c_str());
@@ -101,7 +101,7 @@ int main( int argc, char** argv )
    }
 
    cout << "Writing solution to " << outputPath << "..." << endl;
-   mesh.write( outputPath, degree );
+   mesh.writeFaceField( outputPath, degree );
 
    return 0;
 }

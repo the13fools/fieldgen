@@ -33,6 +33,7 @@ namespace DDG
          // reads a mesh from a valid, open input stream in
 
          static void write( std::ostream& out, const Mesh& mesh, unsigned int n );
+         static void writeFaceField( std::ostream& out, const Mesh& mesh, unsigned int n );
          // writes a mesh to a valid, open output stream out
 
          static  int buildMesh( const MeshData& data, Mesh& mesh );

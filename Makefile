@@ -27,8 +27,8 @@
 
 TARGET = fieldviz
 CLTARGET = fieldgen
-CC = g++
-LD = g++
+CC = g++ -std=c++11
+LD = g++ -std=c++11
 CFLAGS = -g -Wall -Wno-deprecated -Werror -Wno-error=deprecated-declarations -ansi -pedantic $(DDG_INCLUDE_PATH) -I./include -I./src -DGL_GLEXT_PROTOTYPES
 LFLAGS = -g -Wall -Wno-deprecated -Werror -pedantic $(DDG_LIBRARY_PATH)
 LIBS = $(DDG_OPENGL_LIBS) $(DDG_SUITESPARSE_LIBS) $(DDG_BLAS_LIBS)

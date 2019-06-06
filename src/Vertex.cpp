@@ -53,6 +53,16 @@ namespace DDG
     return X()->next->vertex->position - X()->vertex->position;
   }
 
+  const Vector Vertex::fieldVector() const{
+    const Vector N = this->normal; // normal
+    const Vector e1 = this->Xvector().unit(); // bases for tangent plane
+    const Vector e2 = cross( N, e1 );
+
+    const double theta = this->u.arg();
+    const Vector V = cos(theta)*e1 + sin(theta)*e2;
+    return V;
+  }
+
   double
   Vertex::AngleOfEdge( const HalfEdgeCIter he ) const{
     // measure the angle from X() to he
