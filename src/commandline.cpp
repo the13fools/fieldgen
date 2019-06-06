@@ -17,8 +17,11 @@ void printUsage(const std::string& programName)
              << "[--degree=n] "
              << "[--alignToCurvature] "
              << "[--alignToBoundary] "
+             << "[--bisectT] "
+             << "[--sampleToFaces] "
              << "[--s=S] "
              << "[--t=T]"
+             << "[--l=L]"
              << std::endl;
 }
 
@@ -38,7 +41,8 @@ bool parseArg(const std::string& arg, const std::string& searchStr, std::string&
 }
 
 void parseArgs(int argc, char *argv[], std::string& inputPath, std::string& outputPath,
-      int& degree, bool& alignToCurvature, bool& alignToBoundary, double& s, double& t)
+      int& degree, bool& alignToCurvature, bool& alignToBoundary, bool& bisectT, 
+      bool& sampleToFaces, double& s, double& t, double& t)
 {
    if (argc < 3) {
       // input and/or output path not specified
@@ -56,8 +60,11 @@ void parseArgs(int argc, char *argv[], std::string& inputPath, std::string& outp
          if (parseArg(argv[i], "--degree=", degreeStr)) degree = std::atoi(degreeStr.c_str());
          if (doesArgExist(argv[i], "--alignToCurvature")) alignToCurvature = true;
          if (doesArgExist(argv[i], "--alignToBoundary")) alignToBoundary = true;
+         if (doesArgExist(argv[i], "--bisectT")) bisectT = true;
+         if (doesArgExist(argv[i], "--sampleToFaces")) sampleToFaces = true;
          if (parseArg(argv[i], "--s=", sStr)) s = std::atof(sStr.c_str());
          if (parseArg(argv[i], "--t=", tStr)) t = std::atof(tStr.c_str());
+         if (parseArg(argv[i], "--l=", tStr)) l = std::atof(tStr.c_str());
       }
    }
 
@@ -75,9 +82,13 @@ int main( int argc, char** argv )
    int degree = 1;
    bool alignToCurvature = false;
    bool alignToBoundary = false;
+   bool bisectT = false;
+   bool sampleToFaces = false;
    double s = 0.;
    double t = 0.;
-   parseArgs( argc, argv, inputPath, outputPath, degree, alignToCurvature, alignToBoundary, s, t );
+   double l = 0.;
+   parseArgs( argc, argv, inputPath, outputPath, degree, 
+              alignToCurvature, alignToBoundary, bisectT, sampleToFaces, s, t, l );
 
    Mesh mesh;
 
@@ -87,9 +98,32 @@ int main( int argc, char** argv )
    cout << "Computing field..." << endl;
    mesh.InitKVecDirData();
    mesh.clearSingularities();
-   if( alignToCurvature )
+  
+   std::cout << "s " << s << " t " << t << endl;
+   if (bisectT)
    {
-      mesh.SmoothestCurvatureAlignment( degree, s, t, true );
+    double minVal = -100000;
+    double maxVal = mesh.ComputeSmoothest( degree, s, true );
+    double stepSize = (maxVal - minVal) / 2;
+    double lambda = maxVal - stepSize;
+    for (int i = 0; i < 30; i++)
+    {
+      stepSize = stepSize / 2;
+      double curTVal = mesh.SmoothestCurvatureAlignment( degree, s, lambda, true );
+      if (curTVal < t)
+      {
+        lambda += stepSize;
+      }
+      else 
+      {
+        lambda -= stepSize;
+      }
+      std::cout << " curT " << curTVal << " t " << t << " l " << lambda << " l1 " << maxVal;
+    }
+   }
+   else if( alignToCurvature )
+   {
+      mesh.SmoothestCurvatureAlignment( degree, s, l, true );
    }
    else if( alignToBoundary )
    {
@@ -101,7 +135,15 @@ int main( int argc, char** argv )
    }
 
    cout << "Writing solution to " << outputPath << "..." << endl;
-   mesh.writeFaceField( outputPath, degree );
+   if (sampleToFaces)
+   {
+      mesh.writeFaceField( outputPath, degree );
+   }
+   else 
+   {
+      mesh.write( outputPath, degree );
+   }
+
 
    return 0;
 }

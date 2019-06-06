@@ -97,7 +97,7 @@ namespace DDG
     void InitKVecDirData( void ); 
     // solves for the smoothest of degree n, energy parameter s,
     // direction? (or vector)
-    void ComputeSmoothest( const unsigned int n, const double s, const bool dir );
+    double ComputeSmoothest( const unsigned int n, const double s, const bool dir );
     // solves for smoothest field with boundary vectors fixed to boundary normals
     void ComputeSmoothestFixedBoundary( const unsigned int n, const double s, const bool dir );
     // solver function when using alignment energy

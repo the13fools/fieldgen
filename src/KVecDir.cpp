@@ -292,7 +292,7 @@ namespace DDG{
   }
 
   // energy minimizer
-  void Mesh::ComputeSmoothest( const unsigned int n, const double s, const bool dir ){
+  double Mesh::ComputeSmoothest( const unsigned int n, const double s, const bool dir ){
 
     cerr << "Mesh::ComputeSmoothest: n: " << n << " s: " << s << " dir: " << dir << endl;
 
@@ -325,6 +325,7 @@ namespace DDG{
     }
     double t1 = wallClock(); printTiming( "compute smoothest field", t1-t0 );
     cerr << "triangles: " << faces.size() << endl;
+    return rayleighQuotient( A, M, u ).norm();
   } // ComputeSmoothest
 
   void Mesh::ComputeSmoothestFixedBoundary( const unsigned int n, const double s, const bool dir ){
@@ -375,12 +376,12 @@ namespace DDG{
   // differential, but could be something else; here we will assume
   // however that it is the Hopf differential
   double Mesh::SmoothestCurvatureAlignment( unsigned int n, double s, double lambda, bool dir ){
-    cerr << "Mesh::CurvatureSmoothestAlignment: n: " << n << " s: " << s << " lambda: " << lambda << endl;
+ //   cerr << "Mesh::CurvatureSmoothestAlignment: n: " << n << " s: " << s << " lambda: " << lambda << endl;
     if( n != 2 && n != 4 ){
       cerr << "alignment code requires n == 2 or n == 4; n is: " << n << endl;
       return 0;
     }
-    double t0 = wallClock();
+  //  double t0 = wallClock();
 
     const unsigned int nv = vertices.size();
     SparseMatrix<Complex> A( nv, nv ), M( nv, nv );
@@ -403,18 +404,20 @@ namespace DDG{
     }
 
     solvePositiveDefinite( A, u, q );
+    double normU = rayleighQuotient( A, M, u ).norm();
+    normU = sqrt( normU );
 
     // load result
     i = 0; for( VertexIter vi = vertices.begin(); vi != vertices.end(); i++, vi++ ) vi->u = u(vi->id,0);
 
-    double normU = 0;
-    {
-      q = M*u;
-      for( i = 0; i < nv; i++ ){
-	normU += (u(i,0).conj()*q(i,0)).re;
-      }
-      normU = sqrt( normU );
-    }
+ //    double normU = 0;
+ //    {
+ //      q = M*u;
+ //      for( i = 0; i < nv; i++ ){
+	// normU += (u(i,0).conj()*q(i,0)).re;
+ //      }
+ //      normU = sqrt( normU );
+ //    }
 
     ComputeIndices( n );
 
@@ -423,11 +426,11 @@ namespace DDG{
       const Complex z = vi->u;
       vi->u = Phase(z.arg()/n) * ( dir ? 1. : pow(z.norm(),1./n) );
     }
-    double t1 = wallClock(); printTiming( "compute aligned field", t1-t0 );
-    cerr << "triangles: " << faces.size() << endl;
+ //   double t1 = wallClock(); printTiming( "compute aligned field", t1-t0 );
+ //   cerr << "triangles: " << faces.size() << endl;
 
     // let the caller know what the actual t value was
-    cerr << "corresponding t value: " << 1./(1.+normU) << endl;
+ //   cerr << "corresponding t value: " << 1./(1.+normU) << endl;
     return 1./(1.+normU);
   }
 
