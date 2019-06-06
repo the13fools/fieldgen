@@ -1,4 +1,5 @@
 #include <string>
+#include <sstream>
 #include <iostream>
 using namespace std;
 
@@ -42,7 +43,7 @@ bool parseArg(const std::string& arg, const std::string& searchStr, std::string&
 
 void parseArgs(int argc, char *argv[], std::string& inputPath, std::string& outputPath,
       int& degree, bool& alignToCurvature, bool& alignToBoundary, bool& bisectT, 
-      bool& sampleToFaces, double& s, double& t, double& t)
+      bool& sampleToFaces, double& s, double& t, double& l)
 {
    if (argc < 3) {
       // input and/or output path not specified
@@ -99,17 +100,18 @@ int main( int argc, char** argv )
    mesh.InitKVecDirData();
    mesh.clearSingularities();
   
+   double curTVal, lambda;
    std::cout << "s " << s << " t " << t << endl;
    if (bisectT)
    {
     double minVal = -100000;
     double maxVal = mesh.ComputeSmoothest( degree, s, true );
     double stepSize = (maxVal - minVal) / 2;
-    double lambda = maxVal - stepSize;
+    lambda = maxVal - stepSize;
     for (int i = 0; i < 30; i++)
     {
       stepSize = stepSize / 2;
-      double curTVal = mesh.SmoothestCurvatureAlignment( degree, s, lambda, true );
+      curTVal = mesh.SmoothestCurvatureAlignment( degree, s, lambda, true );
       if (curTVal < t)
       {
         lambda += stepSize;
@@ -137,7 +139,22 @@ int main( int argc, char** argv )
    cout << "Writing solution to " << outputPath << "..." << endl;
    if (sampleToFaces)
    {
-      mesh.writeFaceField( outputPath, degree );
+      std::string base_filename = outputPath.substr(outputPath.find_last_of("/\\") + 1);
+      std::string::size_type const p(base_filename.find_last_of('.'));
+      std::string base = base_filename.substr(0, p);
+      char buff[500];
+      snprintf(buff, sizeof(buff), "output/%s_t%0.1f_l%0.4f.repv", base.c_str(), t, lambda);
+      std::string procOutputPath = buff;
+/*      std::ostringstream tss, lss;
+      tss << t; 
+      std::string ts = tss.str();
+      std::cout << ts << " ";
+      lss << l;
+      std::string ls = lss.str();
+      std::cout << ls << " " << endl << endl << endl;
+      std::string procOutputPath = "output/" + base + "_t" + ts + "_l" + ls + ".repv"; */
+      std::cout << procOutputPath << std::endl;
+      mesh.writeFaceField( procOutputPath, degree );
    }
    else 
    {
