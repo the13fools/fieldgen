@@ -145,14 +145,6 @@ int main( int argc, char** argv )
       char buff[500];
       snprintf(buff, sizeof(buff), "output/%s_t%0.1f_l%0.4f.repv", base.c_str(), t, lambda);
       std::string procOutputPath = buff;
-/*      std::ostringstream tss, lss;
-      tss << t; 
-      std::string ts = tss.str();
-      std::cout << ts << " ";
-      lss << l;
-      std::string ls = lss.str();
-      std::cout << ls << " " << endl << endl << endl;
-      std::string procOutputPath = "output/" + base + "_t" + ts + "_l" + ls + ".repv"; */
       std::cout << procOutputPath << std::endl;
       mesh.writeFaceField( procOutputPath, degree );
    }
